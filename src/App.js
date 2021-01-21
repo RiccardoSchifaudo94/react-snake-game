@@ -10,15 +10,21 @@ const getRandomCoordinates = () =>{
   return [x,y]
 }
 
+
 const initialState = {
   food:getRandomCoordinates(),
   direction:'RIGHT',
   speed:200,
+  score:2,
+  countMoves:0,
+  ratioScoreMoves:0,
   snakeDots:[
     [0,0],
     [2,0]
   ]
 }
+
+
 
 class App extends Component {
 
@@ -33,6 +39,16 @@ class App extends Component {
     this.checkIfOutOfBorders();
     this.checkIfCollapsed();
     this.checkIfEat();
+    
+  }
+  
+  updateScoreSnake = () =>{
+    return this.setState({score:this.state.snakeDots.length + 1});
+  }
+
+  updateMovesScoreAndRatio = () =>{
+    this.setState({countMoves:this.state.countMoves+1});
+    this.setState({ratioScoreMoves:Math.floor((this.state.score/this.state.countMoves)*100)});
   }
 
   onKeyDown = (e) =>{
@@ -40,17 +56,24 @@ class App extends Component {
     e = e || window.event;
     
     switch(e.keyCode){
+      case 13:
+        alert("GAME - PAUSE, Press Enter to continue...");
+        break;
       case 38:
         this.setState({direction:'UP'});
+       
         break;
       case 40:
         this.setState({direction:'DOWN'});
+        this.updateMovesScoreAndRatio();
         break;
       case 37: 
         this.setState({direction: 'LEFT'});
+        this.updateMovesScoreAndRatio();
         break;
       case 39:
         this.setState({direction: 'RIGHT'});
+        this.updateMovesScoreAndRatio();
         break;  
     }
 
@@ -97,6 +120,8 @@ class App extends Component {
       this.onGameOver();
     }
 
+
+
   }
 
   checkIfCollapsed(){
@@ -131,6 +156,7 @@ class App extends Component {
     this.setState({
       snakeDots:newSnake
     });
+    this.updateScoreSnake();
   }
 
   increaseSpeed(){
@@ -148,10 +174,22 @@ class App extends Component {
 
   render(){
     return (
-      <div className="game-area">
-            <Snake snakeDots={this.state.snakeDots}/>
-            <Food dot={this.state.food}/>
+      <div>
+            <div className="score-area">
+              <ul>
+                <li><stong>Score Snake:</stong> {this.state.score}</li>
+                <li><stong>Count Moves:</stong> {this.state.countMoves}</li>
+                <li><stong>Ratio Score/Moves:</stong> {this.state.ratioScoreMoves} %</li>
+              </ul>
+            </div>
+
+            <div className="game-area">
+                  <Snake snakeDots={this.state.snakeDots}/>
+                  <Food dot={this.state.food}/>
+            </div>
+           
       </div>
+    
     )
   }
  
